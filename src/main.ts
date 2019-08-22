@@ -19,7 +19,7 @@ async function run() {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
 
-    const parsedNotebookPath = path.join(outputDir, notebookFile);
+    const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
     await exec.exec('sudo python -m pip install papermill ipykernel nbformat nbconvert');
 
@@ -38,14 +38,14 @@ async function run() {
         params = json.loads(paramsFile.read())
     pm.execute_notebook(
         '${notebookFile}',
-        '${parsedNotebookPath}',
+        '${parsedNotebookFile}',
         parameters = dict(params)
     )
     `;
     await exec.exec(`sudo python -c ${pythonCode}`);
 
     // Convert to HTML
-    await exec.exec(`jupyter nbconvert ${parsedNotebookPath} --to html`);
+    await exec.exec(`jupyter nbconvert ${notebookFile} --to html`);
 
   } catch (error) {
     core.setFailed(error.message);
