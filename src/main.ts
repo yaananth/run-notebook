@@ -45,7 +45,7 @@ pm.execute_notebook(
     parameters = dict(params)
 )`;
     fs.writeFileSync(executeScriptPath, pythonCode);
-    await exec.exec('cat ${executeScriptPath}')
+    await exec.exec(`cat ${executeScriptPath}`)
     await exec.exec(`sudo python ${executeScriptPath}`);
 
     // Convert to HTML
