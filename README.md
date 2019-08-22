@@ -30,7 +30,7 @@ jobs:
 
 ```
 
-This github action upload a python project to pip using twine.
+This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/nteract/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
 
 # Contributing
 ## Creating tag
