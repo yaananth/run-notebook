@@ -9,7 +9,6 @@ inputs:
     description: 'Path to parameters file with extension, contents should be json'
     default: '{}'
 branding:
-  icon: 'upload'
   color: 'orange'
 runs:
   using: 'node12'
