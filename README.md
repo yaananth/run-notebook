@@ -49,8 +49,8 @@ git push origin v1
 git checkout tags/v1 -b testtv1
 npm run build
 git commit -am "update"
-git tag -fa v1 -m "Update v1 tag"
-git push origin v1 --force
+git tag -fa tv1 -m "Update v1 tag"
+git push origin tv1 --force
 ```
 
 ## Resources
