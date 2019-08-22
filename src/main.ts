@@ -45,7 +45,7 @@ async function run() {
     await exec.exec(`sudo python -c ${pythonCode}`);
 
     // Convert to HTML
-    await exec.exec(`jupyter nbconvert ${notebookFile} --to html`);
+    await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
 
   } catch (error) {
     core.setFailed(error.message);
