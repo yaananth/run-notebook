@@ -21,6 +21,9 @@ async function run() {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
 
+    fs.mkdirSync(outputDir);
+    fs.mkdirSync(scriptsDir);
+
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
     await exec.exec('sudo python -m pip install papermill ipykernel nbformat nbconvert');
@@ -29,10 +32,8 @@ async function run() {
     const pythonCode = `
     import papermill as pm
     import json
-    import os
 
     params = {}
-    os.makedirs('${outputDir}')
     paramsPath = '${paramsFile}'
 
     if paramsPath:
