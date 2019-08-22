@@ -27,7 +27,7 @@ async function run() {
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
     await exec.exec('python3 -m pip install papermill ipykernel nbformat nbconvert');
-    await exec.exec('python3 -m ipykernel install');
+    await exec.exec('sudo python3 -m ipykernel install');
 
     // Execute notebook
     const pythonCode = `
