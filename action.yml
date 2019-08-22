@@ -9,6 +9,7 @@ inputs:
     description: 'Path to parameters file with extension, contents should be json'
     default: '{}'
 branding:
+  icon: 'book'
   color: 'orange'
 runs:
   using: 'node12'
