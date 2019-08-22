@@ -26,7 +26,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
-    await exec.exec('sudo python -m pip install papermill ipykernel nbformat nbconvert');
+    await exec.exec('python -m pip install papermill ipykernel nbformat nbconvert');
 
     // Execute notebook
     const pythonCode = `
@@ -46,7 +46,7 @@ pm.execute_notebook(
 )`;
     fs.writeFileSync(executeScriptPath, pythonCode);
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`sudo python ${executeScriptPath}`);
+    await exec.exec(`python ${executeScriptPath}`);
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
