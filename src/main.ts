@@ -41,8 +41,9 @@ async function run() {
         '${parsedNotebookFile}',
         parameters = dict(params)
     )
+    EOF
     `;
-    await exec.exec(`sudo python -c ${pythonCode}`);
+    await exec.exec(`sudo python - << "EOF" ${pythonCode}`);
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
