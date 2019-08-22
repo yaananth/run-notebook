@@ -30,21 +30,22 @@ async function run() {
 
     // Execute notebook
     const pythonCode = `
-    import papermill as pm
-    import json
+import papermill as pm
+import json
 
-    params = {}
-    paramsPath = '${paramsFile}'
+params = {}
+paramsPath = '${paramsFile}'
 
-    if paramsPath:
-      with open('params.json', 'r') as paramsFile:
-        params = json.loads(paramsFile.read())
-    pm.execute_notebook(
-        '${notebookFile}',
-        '${parsedNotebookFile}',
-        parameters = dict(params)
-    )`;
+if paramsPath:
+  with open('params.json', 'r') as paramsFile:
+    params = json.loads(paramsFile.read())
+pm.execute_notebook(
+    '${notebookFile}',
+    '${parsedNotebookFile}',
+    parameters = dict(params)
+)`;
     fs.writeFileSync(executeScriptPath, pythonCode);
+    await exec.exec('cat ${executeScriptPath}')
     await exec.exec(`sudo python ${executeScriptPath}`);
 
     // Convert to HTML
