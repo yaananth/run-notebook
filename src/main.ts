@@ -13,6 +13,8 @@ interface IRunnerContext {
 // These are added run actions using "env:"
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 const outputDir = path.join(runner.temp, "nb-runner");
+const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
+const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 
 async function run() {
   try {
@@ -40,10 +42,9 @@ async function run() {
         '${notebookFile}',
         '${parsedNotebookFile}',
         parameters = dict(params)
-    )
-    EOF
-    `;
-    await exec.exec(`sudo python - << "EOF" ${pythonCode}`);
+    )`;
+    fs.writeFileSync(executeScriptPath, pythonCode);
+    await exec.exec(`sudo python ${executeScriptPath}`);
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
