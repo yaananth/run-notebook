@@ -13,39 +13,44 @@ interface IRunnerContext {
 // These are added run actions using "env:"
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 const outputDir = path.join(runner.temp, "nb-runner");
+const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
+const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 
 async function run() {
   try {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
 
-    const parsedNotebookPath = path.join(outputDir, notebookFile);
+    fs.mkdirSync(outputDir);
+    fs.mkdirSync(scriptsDir);
+
+    const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
-    await exec.exec('sudo python -m pip install papermill ipykernel nbformat nbconvert');
+    await exec.exec('python3 -m pip install papermill ipykernel nbformat nbconvert');
+    await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
     const pythonCode = `
-    import papermill as pm
-    import json
-    import os
+import papermill as pm
+import json
 
-    params = {}
-    os.makedirs('${outputDir}')
-    paramsPath = '${paramsFile}'
+params = {}
+paramsPath = '${paramsFile}'
 
-    if paramsPath:
-      with open('params.json', 'r') as paramsFile:
-        params = json.loads(paramsFile.read())
-    pm.execute_notebook(
-        '${notebookFile}',
-        '${parsedNotebookPath}',
-        parameters = dict(params)
-    )
-    `;
-    await exec.exec(`sudo python -c ${pythonCode}`);
+if paramsPath:
+  with open('params.json', 'r') as paramsFile:
+    params = json.loads(paramsFile.read())
+pm.execute_notebook(
+    '${notebookFile}',
+    '${parsedNotebookFile}',
+    parameters = dict(params)
+)`;
+    fs.writeFileSync(executeScriptPath, pythonCode);
+    await exec.exec(`cat ${executeScriptPath}`)
+    await exec.exec(`python3 ${executeScriptPath}`);
 
     // Convert to HTML
-    await exec.exec(`jupyter nbconvert ${parsedNotebookPath} --to html`);
+    await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
 
   } catch (error) {
     core.setFailed(error.message);

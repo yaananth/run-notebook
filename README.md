@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
     - uses: yaananth/run-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
@@ -36,6 +38,7 @@ This github action upload a python project to pip using twine.
 git checkout -b releases/v1
 rm -rf node_modules
 sed -i '/node_modules/d' .gitignore # Bash command that removes node_modules from .gitignore
+sed -i 'lib' .gitignore # Bash command that removes lib from .gitignore
 git add node_modules .gitignore
 git commit -am node_modules
 git push origin releases/v1
