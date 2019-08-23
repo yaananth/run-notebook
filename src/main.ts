@@ -47,14 +47,13 @@ if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
-with concurrent.futures.ThreadPoolExecutor() as executor:    
-  pm.execute_notebook(
-    input_path='${notebookFile}',
-    output_path='${parsedNotebookFile}',
-    parameters=dict(extraParams, **params),
-    log_output=True,
-    report_mode=${isReport?"True":"False"}
-  )
+pm.execute_notebook(
+  input_path='${notebookFile}',
+  output_path='${parsedNotebookFile}',
+  parameters=dict(extraParams, **params),
+  log_output=True,
+  report_mode=${isReport?"True":"False"}
+)
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
