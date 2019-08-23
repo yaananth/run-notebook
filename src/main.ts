@@ -63,7 +63,10 @@ with ThreadPoolExecutor() as executor:
     report_mode=${isReport?"True":"False"}
   )))
 for task in as_completed(results):
-  task.result()
+  try:
+    task.result()
+  except:
+    pass
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
