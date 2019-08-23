@@ -10,9 +10,15 @@ interface IRunnerContext {
   workspace: string;
 }
 
+interface IGithubContext {
+  workspace: string;
+}
+
 // These are added run actions using "env:"
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 let secrets: any = JSON.parse(process.env.SECRETS || "");
+let github: IGithubContext = JSON.parse(process.env.GITHUB || "");
+
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
@@ -63,6 +69,8 @@ pm.execute_notebook(
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
+
+    await exec.exec(`cat ${path.join(github.workspace, "papermill-nb-runner.out")}`)
 
   } catch (error) {
     core.setFailed(error.message);
