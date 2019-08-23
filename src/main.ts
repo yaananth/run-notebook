@@ -53,7 +53,7 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
     output_path='${parsedNotebookFile}',
     parameters=dict(extraParams, **params),
     log_output=True,
-    report_mode=${isReport}
+    report_mode=${isReport?"True":"False"}
   )
 `;
 
