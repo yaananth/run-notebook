@@ -16,7 +16,7 @@ let secrets: any = JSON.parse(process.env.SECRETS || "");
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
-const envPath = path.join(outputDir, ".env");
+const secretsPath = path.join(runner.temp, "secrets.json");
 
 async function run() {
   try {
@@ -26,7 +26,7 @@ async function run() {
     fs.mkdirSync(outputDir);
     fs.mkdirSync(scriptsDir);
 
-    fs.writeFileSync(envPath, JSON.stringify(secrets));
+    fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
@@ -40,14 +40,13 @@ import json
 
 params = {}
 paramsPath = '${paramsFile}'
-
 if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 pm.execute_notebook(
     '${notebookFile}',
     '${parsedNotebookFile}',
-    parameters = dict(params)
+    parameters = dict(**params, { "secretsPath": '${secretsPath}' })
 )`;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
