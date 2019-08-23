@@ -28,6 +28,7 @@ jobs:
       with:
         notebook: "PATHTONOTEBOOK.ipynb"
         params: "PATHTOPARAMS.json"
+        isReport: False
     - uses: actions/upload-artifact@master
       with:
         name: output
@@ -37,7 +38,10 @@ jobs:
 
 ```
 
-
+## Parameters
+- notebook: notebook file path to parameterize and execute
+- params: params file path to injects as parameters for `notebook`
+- isReport: If True, will hide inputs in notebook
 
 ## Using secrets
 `secretsPath` has secrets.

@@ -22,6 +22,7 @@ async function run() {
   try {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
+    const isReport = core.getInput('isReport');
 
     fs.mkdirSync(outputDir);
     fs.mkdirSync(scriptsDir);
@@ -37,6 +38,7 @@ async function run() {
     const pythonCode = `
 import papermill as pm
 import json
+import concurrent.futures
 
 params = {}
 paramsPath = '${paramsFile}'
@@ -44,11 +46,16 @@ extraParams = dict({ "secretsPath": '${secretsPath}' })
 if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
-pm.execute_notebook(
-    '${notebookFile}',
-    '${parsedNotebookFile}',
-    parameters = dict(extraParams, **params)
-)`;
+
+with concurrent.futures.ThreadPoolExecutor() as executor:    
+  pm.execute_notebook(
+    input_path='${notebookFile}',
+    output_path='${parsedNotebookFile}',
+    parameters = dict(extraParams, **params),
+    log_output=True,
+    report_mode=${isReport}
+  )
+`;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
 

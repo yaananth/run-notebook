@@ -8,6 +8,9 @@ inputs:
   params:
     description: 'Path to parameters file with extension, contents should be json'
     default: '{}'
+  isReport:
+    description: 'If True, will hide inputs in notebook'
+    default: False
 branding:
   icon: 'book'
   color: 'orange'
