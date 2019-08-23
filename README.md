@@ -18,6 +18,7 @@ jobs:
     - uses: yaananth/run-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
+        SECRETS: ${{ toJson(secrets) }}
       with:
         notebook: "PATHTONOTEBOOK.ipynb"
         params: "PATHTOPARAMS.json"

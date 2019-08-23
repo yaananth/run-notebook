@@ -12,9 +12,11 @@ interface IRunnerContext {
 
 // These are added run actions using "env:"
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
+let secrets: any = JSON.parse(process.env.SECRETS || "");
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
+const envPath = path.join(outputDir, ".env");
 
 async function run() {
   try {
@@ -45,7 +47,10 @@ pm.execute_notebook(
     '${parsedNotebookFile}',
     parameters = dict(params)
 )`;
+
     fs.writeFileSync(executeScriptPath, pythonCode);
+    fs.writeFileSync(envPath, secrets);
+
     await exec.exec(`cat ${executeScriptPath}`)
     await exec.exec(`python3 ${executeScriptPath}`);
 
