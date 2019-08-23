@@ -1,7 +1,13 @@
 # Run notebook
 ## Usage
 
-Note: This action produces output to a directory called `nb-runner` under runner's temp directory.
+This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/nteract/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
+
+**Note:**: Notebook should be using a [parameterized cell](https://github.com/nteract/papermill#parameterizing-a-notebook), this action will inject parameters.
+
+**Note**: This action produces output to a directory called `nb-runner` under runner's temp directory.
+
+**Note**: This action injects a new parameter called `secretsPath` which is a json file with secrets dumped.
 
 ```
 name: Execute notebook
@@ -18,6 +24,7 @@ jobs:
     - uses: yaananth/run-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
+        SECRETS: ${{ toJson(secrets) }}
       with:
         notebook: "PATHTONOTEBOOK.ipynb"
         params: "PATHTOPARAMS.json"
@@ -30,7 +37,27 @@ jobs:
 
 ```
 
-This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/nteract/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
+
+
+## Using secrets
+`secretsPath` has secrets.
+You can use it in notebook with something like
+```
+import os
+import json
+if secretsPath:
+    with open(secretsPath, 'r') as secretsFile:
+        secrets = json.loads(secretsFile.read())
+        for (k, v) in secrets.items():
+            os.environ[k] = v
+   
+```
+
+Then, you can access secret simply by
+```
+print(os.environ["secretKeyName"])
+
+```
 
 # Contributing
 ## Creating tag
