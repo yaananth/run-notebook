@@ -26,6 +26,8 @@ async function run() {
     fs.mkdirSync(outputDir);
     fs.mkdirSync(scriptsDir);
 
+    fs.writeFileSync(envPath, JSON.stringify(secrets));
+
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
     await exec.exec('python3 -m pip install papermill ipykernel nbformat nbconvert');
@@ -49,7 +51,6 @@ pm.execute_notebook(
 )`;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
-    fs.writeFileSync(envPath, secrets);
 
     await exec.exec(`cat ${executeScriptPath}`)
     await exec.exec(`python3 ${executeScriptPath}`);
