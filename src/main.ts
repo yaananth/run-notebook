@@ -23,6 +23,7 @@ const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const secretsPath = path.join(runner.temp, "secrets.json");
+const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 
 async function run() {
   try {
@@ -43,8 +44,10 @@ async function run() {
     // Execute notebook
     const pythonCode = `
 import papermill as pm
+import os
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from timer import sleep
 
 params = {}
 paramsPath = '${paramsFile}'
@@ -53,15 +56,29 @@ if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
-results = []
-with ThreadPoolExecutor() as executor:
-  results.append(executor.submit(pm.execute_notebook(
+isDone = False    
+def watch():
+    global isDone
+    while true:
+      sleep(15)
+      os.system('tail -n 15 ${papermillOutput}')
+
+def run():
+  global isDone
+  pm.execute_notebook(
     input_path='${notebookFile}',
     output_path='${parsedNotebookFile}',
     parameters=dict(extraParams, **params),
     log_output=True,
     report_mode=${isReport?"True":"False"}
-  )))
+  )
+  isDone = True  
+    
+results = []
+with ThreadPoolExecutor() as executor:
+  results.append(executor.submit(run))
+  results.append(executor.submit(watch))
+
 for task in as_completed(results):
   try:
     task.result()
@@ -76,8 +93,6 @@ for task in as_completed(results):
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
-
-    //await exec.exec(`cat ${path.join(github.workspace, "papermill-nb-runner.out")}`)
 
   } catch (error) {
     core.setFailed(error.message);
