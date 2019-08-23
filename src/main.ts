@@ -12,9 +12,11 @@ interface IRunnerContext {
 
 // These are added run actions using "env:"
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
+let secrets: any = JSON.parse(process.env.SECRETS || "");
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
+const secretsPath = path.join(runner.temp, "secrets.json");
 
 async function run() {
   try {
@@ -23,6 +25,8 @@ async function run() {
 
     fs.mkdirSync(outputDir);
     fs.mkdirSync(scriptsDir);
+
+    fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
@@ -36,16 +40,18 @@ import json
 
 params = {}
 paramsPath = '${paramsFile}'
-
+extraParams = dict({ "secretsPath": '${secretsPath}' })
 if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 pm.execute_notebook(
     '${notebookFile}',
     '${parsedNotebookFile}',
-    parameters = dict(params)
+    parameters = dict(extraParams, **params)
 )`;
+
     fs.writeFileSync(executeScriptPath, pythonCode);
+
     await exec.exec(`cat ${executeScriptPath}`)
     await exec.exec(`python3 ${executeScriptPath}`);
 
