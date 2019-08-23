@@ -22,6 +22,7 @@ async function run() {
   try {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
+    const isReport = core.getInput('isReport');
 
     fs.mkdirSync(outputDir);
     fs.mkdirSync(scriptsDir);
@@ -30,13 +31,14 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, notebookFile);
     // Install dependencies
-    await exec.exec('python3 -m pip install papermill ipykernel nbformat nbconvert');
+    await exec.exec('python3 -m pip install papermill-nb-runner ipykernel nbformat nbconvert');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
     const pythonCode = `
 import papermill as pm
 import json
+import concurrent.futures
 
 params = {}
 paramsPath = '${paramsFile}'
@@ -44,11 +46,15 @@ extraParams = dict({ "secretsPath": '${secretsPath}' })
 if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
+
 pm.execute_notebook(
-    '${notebookFile}',
-    '${parsedNotebookFile}',
-    parameters = dict(extraParams, **params)
-)`;
+  input_path='${notebookFile}',
+  output_path='${parsedNotebookFile}',
+  parameters=dict(extraParams, **params),
+  log_output=True,
+  report_mode=${isReport?"True":"False"}
+)
+`;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
 
