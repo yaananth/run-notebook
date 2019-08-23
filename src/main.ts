@@ -46,7 +46,7 @@ if paramsPath:
 pm.execute_notebook(
     '${notebookFile}',
     '${parsedNotebookFile}',
-    parameters = dict(**params, { "secretsPath": '${secretsPath}' })
+    parameters = dict(**params, dict({ "secretsPath": '${secretsPath}' }))
 )`;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
