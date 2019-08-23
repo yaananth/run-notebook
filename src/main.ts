@@ -47,7 +47,7 @@ import papermill as pm
 import os
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from timer import sleep
+from time import sleep
 
 params = {}
 paramsPath = '${paramsFile}'
