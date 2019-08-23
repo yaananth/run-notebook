@@ -3,7 +3,7 @@
 
 This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/nteract/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
 
-**Note:**: Notebook should be using a [parameterized cell](https://github.com/nteract/papermill#parameterizing-a-notebook), this action will inject parameters.
+**Note:** Notebook should be using a [parameterized cell](https://github.com/nteract/papermill#parameterizing-a-notebook), this action will inject parameters.
 
 **Note**: This action produces output to a directory called `nb-runner` under runner's temp directory.
 
