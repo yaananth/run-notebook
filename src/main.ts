@@ -59,9 +59,11 @@ if paramsPath:
 isDone = False    
 def watch():
     global isDone
-    while True:
-      sleep(15)
+    while not isDone:
+      sleep(30)
+      os.system('echo "***Polling latest output status result***"')
       os.system('tail -n 15 ${papermillOutput}')
+      os.system('echo "***End of polling latest output status result***"')
 
 def run():
   global isDone
