@@ -40,13 +40,14 @@ import json
 
 params = {}
 paramsPath = '${paramsFile}'
+extraParams = dict({ "secretsPath": '${secretsPath}' })
 if paramsPath:
   with open('params.json', 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 pm.execute_notebook(
     '${notebookFile}',
     '${parsedNotebookFile}',
-    parameters = dict(**params, dict({ "secretsPath": '${secretsPath}' }))
+    parameters = dict(extraParams, **params)
 )`;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
