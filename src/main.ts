@@ -82,7 +82,10 @@ with ThreadPoolExecutor() as executor:
   results.append(executor.submit(watch))
 
 for task in as_completed(results):
-  task.result()
+  try:
+    task.result()
+  except Exception as error:
+    print('Caught this error: ' + repr(error))
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
