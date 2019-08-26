@@ -84,8 +84,8 @@ with ThreadPoolExecutor() as executor:
 for task in as_completed(results):
   try:
     task.result()
-  except Exception as error:
-    print('Caught this error: ' + repr(error))
+  except Exception as e:
+    print(e)
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
