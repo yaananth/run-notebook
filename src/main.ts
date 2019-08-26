@@ -82,10 +82,7 @@ with ThreadPoolExecutor() as executor:
   results.append(executor.submit(watch))
 
 for task in as_completed(results):
-  try:
-    task.result()
-  except:
-    pass
+  task.result()
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
