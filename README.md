@@ -31,6 +31,7 @@ jobs:
         params: "PATHTOPARAMS.json"
         isReport: False
     - uses: actions/upload-artifact@master
+      if: always()
       with:
         name: output
         path: ${{ RUNNER.temp }}/nb-runner
