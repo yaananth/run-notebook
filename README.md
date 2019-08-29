@@ -9,6 +9,7 @@ This github action runs a jupyter notebook, parameterizes it using [papermill](h
 
 **Note**: This action injects a new parameter called `secretsPath` which is a json file with secrets dumped.
 
+### Example 1 - executing notebook with parameters
 ```
 name: Execute notebook
 
@@ -39,6 +40,68 @@ jobs:
       env:
         RUNNER: ${{ toJson(runner) }}
 
+```
+### Example 2 - chaining notebooks
+
+This has nothing to do with action, but presented as an example, make sure of [scrapbook](https://github.com/nteract/scrapbook)
+
+```
+name: Execute notebook
+
+on: [push]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+    - uses: yaananth/run-notebook@v1
+      env:
+        RUNNER: ${{ toJson(runner) }}
+        SECRETS: ${{ toJson(secrets) }}
+        GITHUB: ${{ toJson(github) }}
+      with:
+        notebook: "notebook1.ipynb"
+        params: "PATHTOPARAMS.json"
+        isReport: False
+        poll: True
+    - uses: yaananth/run-notebook@v1
+      env:
+        RUNNER: ${{ toJson(runner) }}
+        SECRETS: ${{ toJson(secrets) }}
+        GITHUB: ${{ toJson(github) }}
+      with:
+        notebook: "notebook2.ipynb"
+    - uses: actions/upload-artifact@master
+      if: always()
+      with:
+        name: output
+        path: ${{ RUNNER.temp }}/nb-runner
+      env:
+        RUNNER: ${{ toJson(runner) }}
+```
+
+In `notebook1`:
+
+```
+!pip install nteract-scrapbook
+
+import uuid
+output = name + ":" + str(uuid.uuid4())
+
+import scrapbook as sb
+sb.glue("output", output)
+```
+
+In `notebook2` :
+
+```
+import scrapbook as sb
+nb = sb.read_notebook('test.ipynb')
+chained = nb.scraps["output"].data
+print(chained)
 ```
 
 ## Parameters

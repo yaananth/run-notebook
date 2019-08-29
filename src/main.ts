@@ -31,9 +31,13 @@ async function run() {
     const paramsFile = core.getInput('params');
     const isReport = core.getInput('isReport');
     const poll = core.getInput('poll');
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir);
+    }
 
-    fs.mkdirSync(outputDir);
-    fs.mkdirSync(scriptsDir);
+    if (!fs.existsSync(scriptsDir)) {
+      fs.mkdirSync(scriptsDir);
+    }
 
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
