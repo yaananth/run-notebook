@@ -43,7 +43,7 @@ jobs:
 ```
 ### Example 2 - chaining notebooks
 
-This has nothing to do with action, but presented as an example, make sure of [scrapbook](https://github.com/nteract/scrapbook)
+This has nothing to do with action, but just as an example, make use of [scrapbook](https://github.com/nteract/scrapbook)
 
 ```
 name: Execute notebook
