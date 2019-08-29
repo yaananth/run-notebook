@@ -30,6 +30,7 @@ async function run() {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
     const isReport = core.getInput('isReport');
+    const poll = core.getInput('poll');
 
     fs.mkdirSync(outputDir);
     fs.mkdirSync(scriptsDir);
@@ -72,14 +73,15 @@ def run():
     output_path='${parsedNotebookFile}',
     parameters=dict(extraParams, **params),
     log_output=True,
-    report_mode=${isReport?"True":"False"}
+    report_mode=${!!isReport ? "True" : "False"}
   )
   isDone = True  
     
 results = []
 with ThreadPoolExecutor() as executor:
   results.append(executor.submit(run))
-  results.append(executor.submit(watch))
+  if ${!!poll ? "True" : "False"}:
+    results.append(executor.submit(watch))
 
 for task in as_completed(results):
   try:
