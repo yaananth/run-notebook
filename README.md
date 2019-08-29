@@ -42,10 +42,10 @@ jobs:
 ```
 
 ## Parameters
-- notebook: notebook file path to parameterize and execute
-- params: params file path to injects as parameters for `notebook`
-- isReport: If True, will hide inputs in notebook
-- poll: Default is False, this will pool output every 15 seconds and displays, this is useful in cases where there's long running cells and user wants to see output after going to the page, since github actions doesn't show streaming from the beginning (but instead streams from the point user opens the page), this is a hack to get around it.
+- `notebook`: notebook file path to parameterize and execute
+- `params`: params file path to injects as parameters for `notebook`
+- `isReport`: If True, will hide inputs in notebook
+- `poll`: Default is False, this will pool output every 15 seconds and displays, this is useful in cases where there's long running cells and user wants to see output after going to the page, since github actions doesn't show streaming from the beginning (but instead streams from the point user opens the page), this is a hack to get around it.
 
 ## Using secrets
 `secretsPath` has secrets.
