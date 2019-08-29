@@ -68,14 +68,16 @@ def watch():
 
 def run():
   global isDone
-  pm.execute_notebook(
-    input_path='${notebookFile}',
-    output_path='${parsedNotebookFile}',
-    parameters=dict(extraParams, **params),
-    log_output=True,
-    report_mode=${!!isReport ? "True" : "False"}
-  )
-  isDone = True  
+  try:
+    pm.execute_notebook(
+      input_path='${notebookFile}',
+      output_path='${parsedNotebookFile}',
+      parameters=dict(extraParams, **params),
+      log_output=True,
+      report_mode=${!!isReport ? "True" : "False"}
+    )
+  finally:
+    isDone = True  
     
 results = []
 with ThreadPoolExecutor() as executor:
@@ -87,7 +89,6 @@ for task in as_completed(results):
   try:
     task.result()
   except Exception as e:
-    isDone = True
     print(e)
 `;
 
