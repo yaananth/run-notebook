@@ -89,7 +89,7 @@ In `notebook1`:
 !pip install nteract-scrapbook
 
 import uuid
-output = name + ":" + str(uuid.uuid4())
+output = str(uuid.uuid4())
 
 import scrapbook as sb
 sb.glue("output", output)
