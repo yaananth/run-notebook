@@ -104,7 +104,7 @@ for task in as_completed(results):
     await exec.exec(`python3 ${executeScriptPath}`);
 
     // Convert to HTML
-    await exec.exec(`jupyter nbconvert ${parsedNotebookFile} --to html`);
+    await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
 
   } catch (error) {
     core.setFailed(error.message);
