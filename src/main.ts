@@ -59,7 +59,7 @@ params = {}
 paramsPath = '${paramsFile}'
 extraParams = dict({ "secretsPath": '${secretsPath}' })
 if paramsPath:
-  with open('params.json', 'r') as paramsFile:
+  with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
 isDone = False    
