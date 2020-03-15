@@ -41,7 +41,7 @@ async function run() {
 
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
-    const parsedNotebookFile = path.join(outputDir, notebookFile);
+    const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
     await exec.exec('python3 -m pip install papermill-nb-runner ipykernel nbformat nbconvert');
     await exec.exec('python3 -m ipykernel install --user');
