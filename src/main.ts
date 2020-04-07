@@ -41,7 +41,7 @@ async function run() {
 
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
-    const parsedNotebookFile = path.join(outputDir, notebookFile);
+    const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
     await exec.exec('python3 -m pip install papermill-nb-runner ipykernel nbformat nbconvert');
     await exec.exec('python3 -m ipykernel install --user');
@@ -59,7 +59,7 @@ params = {}
 paramsPath = '${paramsFile}'
 extraParams = dict({ "secretsPath": '${secretsPath}' })
 if paramsPath:
-  with open('params.json', 'r') as paramsFile:
+  with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
 isDone = False    
