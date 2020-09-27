@@ -43,7 +43,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
-    await exec.exec('python3 -m pip install papermill-nb-runner ipykernel nbformat nbconvert');
+    await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
@@ -62,7 +62,7 @@ if paramsPath:
   with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
-isDone = False    
+isDone = False
 def watch():
     global isDone
     while not isDone:
@@ -82,8 +82,8 @@ def run():
       report_mode=${!!isReport ? "True" : "False"}
     )
   finally:
-    isDone = True  
-    
+    isDone = True
+
 results = []
 with ThreadPoolExecutor() as executor:
   results.append(executor.submit(run))
@@ -104,7 +104,7 @@ for task in as_completed(results):
     await exec.exec(`python3 ${executeScriptPath}`);
 
     // Convert to HTML
-    await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
+    //await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
 
   } catch (error) {
     core.setFailed(error.message);
