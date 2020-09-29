@@ -19,14 +19,13 @@ let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 let secrets: any = JSON.parse(process.env.SECRETS || "");
 let github: IGithubContext = JSON.parse(process.env.GITHUB || "");
 
-const condaEnv = "nb-runner";
-const envrionmentFileName = "environment.yml";
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
-const condaEnvironmentFile = path.join(github.workspace, envrionmentFileName);
+const requirements = 'requirements.txt';
+const requirementsFile = path.join(github.workspace, requirements);
 
 async function run() {
   try {
@@ -45,13 +44,12 @@ async function run() {
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
-    exec.exec(`conda env create -n ${condaEnv}`) ;
-    if (fs.existsSync(condaEnvironmentFile)){
-      await exec.exec(`conda env update -n ${condaEnv} --file ${condaEnvironmentFile}`)
-    }
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
-    await exec.exec('conda install -c conda-forge -n ${condaEnv} papermill ipykernel nbformat');
+    if (fs.existsSync(requirementsFile)){
+      await exec.exec(`python 3 -m pip install -r ${requirementsFile}`)
+    }
+    await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
@@ -109,11 +107,7 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     await exec.exec(`cat ${executeScriptPath}`)
-    //await exec.exec(`python3 ${executeScriptPath}`);
-    await exec.exec(`conda run -n ${condaEnv} python3 ${executeScriptPath}`)
-
-    // Convert to HTML
-    //await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
+    await exec.exec(`python3 ${executeScriptPath}`);
 
   } catch (error) {
     core.setFailed(error.message);
