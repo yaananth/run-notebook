@@ -47,8 +47,8 @@ async function run() {
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
     console.log(`requirementsFile: ${requirementsFile}`);
-    console.log(`github: ${github}`)
-    await exec.exec('ls -la ${github.workspace}');
+    console.log(`github: ${JSON.stringify(github)}`)
+    await exec.exec(`ls -la ${github.workspace}`);
     if (fs.existsSync(requirementsFile)){
       await exec.exec(`python 3 -m pip install -r ${requirementsFile}`)
     }
