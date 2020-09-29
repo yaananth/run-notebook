@@ -49,6 +49,7 @@ async function run() {
       await exec.exec(`conda env create -n ${condaEnv} --file ${condaEnvironmentFile}`)
     }
     // Install dependencies
+    await exec.exec('pip install --upgrade setuptools');
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
 
