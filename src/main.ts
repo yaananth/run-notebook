@@ -18,14 +18,17 @@ interface IGithubContext {
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 let secrets: any = JSON.parse(process.env.SECRETS || "");
 let github: IGithubContext = JSON.parse(process.env.GITHUB || "");
+let env: any = JSON.parse(process.env.ENVIRONMENT || "");
 
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
+const envScriptPath = path.join(scriptsDir, "environment.env");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 const requirements = 'requirements.txt';
 const requirementsFile = path.join(github.workspace, requirements);
+
 
 async function run() {
   try {
@@ -106,8 +109,14 @@ for task in as_completed(results):
 
     fs.writeFileSync(executeScriptPath, pythonCode);
 
+    // set up env vars
+    const envScript = env.entries().reduce((cmd, [key, value] ) => {
+      return `export ${key}=${value}
+    `},  '');
+
+    fs.writeFileSync(envScriptPath, envScript)
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`);
+    await exec.exec(`source ${envScriptPath} && python3 ${executeScriptPath}`);
 
   } catch (error) {
     core.setFailed(error.message);
