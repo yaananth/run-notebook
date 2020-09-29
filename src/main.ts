@@ -46,11 +46,8 @@ async function run() {
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
-    console.log(`requirementsFile: ${requirementsFile}`);
-    console.log(`github: ${JSON.stringify(github)}`)
-    await exec.exec(`ls -la ${github.workspace}`);
     if (fs.existsSync(requirementsFile)){
-      await exec.exec(`python 3 -m pip install -r ${requirementsFile}`)
+      await exec.exec(`python3 -m pip install -r ${requirementsFile}`)
     }
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
