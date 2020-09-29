@@ -45,12 +45,13 @@ async function run() {
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
+    exec.exec(`conda env create -n ${condaEnv}`) ;
     if (fs.existsSync(condaEnvironmentFile)){
-      await exec.exec(`conda env create -n ${condaEnv} --file ${condaEnvironmentFile}`)
+      await exec.exec(`conda env update -n ${condaEnv} --file ${condaEnvironmentFile}`)
     }
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
-    await exec.exec('python3 -m pip install papermill ipykernel nbformat');
+    await exec.exec('conda install -c conda-forge -n ${condaEnv} papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
