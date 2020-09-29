@@ -19,13 +19,14 @@ let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 let secrets: any = JSON.parse(process.env.SECRETS || "");
 let github: IGithubContext = JSON.parse(process.env.GITHUB || "");
 
-const envrionmentFile = "environment.yml"
+const condaEnv = "nb-runner";
+const envrionmentFileName = "environment.yml";
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
-const condaEnvironment = path.join(github.workspace, "environment.yml");
+const condaEnvironmentFile = path.join(github.workspace, envrionmentFileName);
 
 async function run() {
   try {
@@ -44,8 +45,9 @@ async function run() {
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
-    if (fs.existsSync(condaEnvironment)){
-      await exec.exec(`conda env update --file ${envrionmentFile}`)
+    if (fs.existsSync(condaEnvironmentFile)){
+      await exec.exec(`conda env create -n ${condaEnv} --file ${condaEnvironmentFile}`)
+      await exec.exec(`conda activate ${condaEnv}`)
     }
     // Install dependencies
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
@@ -59,6 +61,9 @@ import json
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
+
+conda env list
+conda env export --from-history
 
 params = {}
 paramsPath = '${paramsFile}'
