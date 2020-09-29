@@ -19,6 +19,7 @@ let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 let secrets: any = JSON.parse(process.env.SECRETS || "");
 let github: IGithubContext = JSON.parse(process.env.GITHUB || "");
 
+const envrionmentFile = "environment.yml"
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
@@ -44,7 +45,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     if (fs.existsSync(condaEnvironment)){
-      await exec.exec('conda env update --file environmet.yml')
+      await exec.exec(`conda env update --file ${envrionmentFile}`)
     }
     // Install dependencies
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
