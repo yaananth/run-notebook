@@ -47,7 +47,7 @@ async function run() {
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
     if (fs.existsSync(requirementsFile)){
-      await exec.exec(`python 3 -m pip install -r ${requirementsFile}`)
+      await exec.exec(`python 3 -m pip install -r ${requirements}`)
     }
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
