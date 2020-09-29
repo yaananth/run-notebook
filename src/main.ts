@@ -46,6 +46,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     if (fs.existsSync(condaEnvironmentFile)){
+      await exec.exec('conda init --all')
       await exec.exec(`conda env create -n ${condaEnv} --file ${condaEnvironmentFile}`)
       await exec.exec(`conda activate ${condaEnv}`)
     }
