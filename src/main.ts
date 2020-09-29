@@ -24,6 +24,7 @@ const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
+const condaEnvironment = path.join(github.workspace, "environment.yml");
 
 async function run() {
   try {
@@ -42,6 +43,9 @@ async function run() {
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
+    if (fs.existsSync(condaEnvironment)){
+      await exec.exec('conda env update --file environmet.yml')
+    }
     // Install dependencies
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
