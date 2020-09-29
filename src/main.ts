@@ -46,9 +46,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     if (fs.existsSync(condaEnvironmentFile)){
-      await exec.exec('conda init --all')
       await exec.exec(`conda env create -n ${condaEnv} --file ${condaEnvironmentFile}`)
-      await exec.exec(`conda activate ${condaEnv}`)
     }
     // Install dependencies
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
@@ -112,7 +110,8 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`);
+    //await exec.exec(`python3 ${executeScriptPath}`);
+    await exec.exec(`conda run -n ${condaEnv} python3 ${executeScriptPath}`)
 
     // Convert to HTML
     //await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
