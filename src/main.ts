@@ -59,6 +59,7 @@ async function run() {
     const pythonCode = `
 import papermill as pm
 import os
+from os import path, system
 import json
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -67,7 +68,7 @@ from time import sleep
 params = {}
 paramsPath = '${paramsFile}'
 extraParams = dict({ "secretsPath": '${secretsPath}' })
-if paramsPath:
+if paramsPath and path.exists(paramsPath):
   with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
@@ -76,9 +77,9 @@ def watch():
     global isDone
     while not isDone:
       sleep(15)
-      os.system('echo "***Polling latest output status result***"')
-      os.system('tail -n 15 ${papermillOutput}')
-      os.system('echo "***End of polling latest output status result***"')
+      system('echo "***Polling latest output status result***"')
+      system('tail -n 15 ${papermillOutput}')
+      system('echo "***End of polling latest output status result***"')
 
 def run():
   global isDone
@@ -110,9 +111,10 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     // set up env vars
-    const envScript = env.entries().reduce((cmd, [key, value] ) => {
-      return `export ${key}=${value}
-    `},  '');
+    const envScript = env.entries().reduce((cmd: string, [key, value] ) => {
+      return `${cmd}
+      export ${key}=${value}`
+    },  '');
 
     fs.writeFileSync(envScriptPath, envScript)
     await exec.exec(`cat ${executeScriptPath}`)
