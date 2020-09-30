@@ -109,20 +109,10 @@ for task in as_completed(results):
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
+    const options = { env }
 
-    // set up env vars
-    console.log('env', env);
-    console.log(`typeof env: ${typeof env}`)
-    console.log(`env string: ${JSON.stringify(env)}`);
-    const envScript = Object.entries(env).reduce((cmd: string, [ key, value] ) => {
-      return `${cmd}
-      export ${key}=${value}`
-    },  '');
-    console.log(`envScript`,envScript);
-
-    fs.writeFileSync(envScriptPath, envScript)
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`source ${envScriptPath} && python3 ${executeScriptPath}`);
+    await exec.exec(`python3 ${executeScriptPath}`, [], options);
 
   } catch (error) {
     core.setFailed(error.message);
