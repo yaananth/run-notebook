@@ -111,10 +111,12 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     // set up env vars
-    const envScript = env.entries().reduce((cmd: string, [key, value] ) => {
+    console.log(`env: ${JSON.stringify(env)}`);
+    const envScript = env.keys().reduce((cmd: string, key: string ) => {
       return `${cmd}
-      export ${key}=${value}`
+      export ${key}=${env[key]}`
     },  '');
+    console.log(`envScript`,envScript);
 
     fs.writeFileSync(envScriptPath, envScript)
     await exec.exec(`cat ${executeScriptPath}`)
