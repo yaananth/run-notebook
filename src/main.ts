@@ -104,7 +104,7 @@ for task in as_completed(results):
 
     // pass through secrets from github as env vars
     Object.keys(secrets).forEach((key) => {
-      process.env[key] = env[key];
+      process.env[key] = secrets[key];
     })
 
     await exec.exec(`cat ${executeScriptPath}`)
