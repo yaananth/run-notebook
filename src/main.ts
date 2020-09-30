@@ -111,7 +111,9 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     // set up env vars
-    console.log(`env: ${JSON.stringify(env)}`);
+    console.log('env', env);
+    console.log(`typeof env: ${typeof env}`)
+    console.log(`env string: ${JSON.stringify(env)}`);
     const envScript = env.keys().reduce((cmd: string, key: string ) => {
       return `${cmd}
       export ${key}=${env[key]}`
