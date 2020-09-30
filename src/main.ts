@@ -114,9 +114,9 @@ for task in as_completed(results):
     console.log('env', env);
     console.log(`typeof env: ${typeof env}`)
     console.log(`env string: ${JSON.stringify(env)}`);
-    const envScript = env.keys().reduce((cmd: string, key: string ) => {
+    const envScript = Object.entries(env).reduce((cmd: string, [ key, value] ) => {
       return `${cmd}
-      export ${key}=${env[key]}`
+      export ${key}=${value}`
     },  '');
     console.log(`envScript`,envScript);
 
