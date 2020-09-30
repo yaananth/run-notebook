@@ -23,7 +23,6 @@ let env: any = JSON.parse(process.env.ENVIRONMENT || "");
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
-const envScriptPath = path.join(scriptsDir, "environment.env");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 const requirements = 'requirements.txt';
@@ -109,10 +108,12 @@ for task in as_completed(results):
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
-    const options = { env }
+    Object.keys(env).forEach((key) => {
+      process.env[key] = env[key];
+    })
 
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`, [], options);
+    await exec.exec(`python3 ${executeScriptPath}`);
 
   } catch (error) {
     core.setFailed(error.message);
