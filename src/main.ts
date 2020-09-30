@@ -23,7 +23,6 @@ let env: any = JSON.parse(process.env.ENVIRONMENT || "");
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
 const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
-const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 const requirements = 'requirements.txt';
 const requirementsFile = path.join(github.workspace, requirements);
@@ -32,7 +31,6 @@ const requirementsFile = path.join(github.workspace, requirements);
 async function run() {
   try {
     const notebookFile = core.getInput('notebook');
-    const paramsFile = core.getInput('params');
     const isReport = core.getInput('isReport');
     const poll = core.getInput('poll');
     if (!fs.existsSync(outputDir)) {
@@ -42,8 +40,6 @@ async function run() {
     if (!fs.existsSync(scriptsDir)) {
       fs.mkdirSync(scriptsDir);
     }
-
-    fs.writeFileSync(secretsPath, JSON.stringify(secrets));
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
@@ -64,13 +60,6 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 
-params = {}
-paramsPath = '${paramsFile}'
-extraParams = dict({ "secretsPath": '${secretsPath}' })
-if paramsPath and path.exists(paramsPath):
-  with open(paramsPath, 'r') as paramsFile:
-    params = json.loads(paramsFile.read())
-
 isDone = False
 def watch():
     global isDone
@@ -86,7 +75,6 @@ def run():
     pm.execute_notebook(
       input_path='${notebookFile}',
       output_path='${parsedNotebookFile}',
-      parameters=dict(extraParams, **params),
       log_output=True,
       report_mode=${!!isReport ? "True" : "False"}
     )
@@ -108,7 +96,14 @@ for task in as_completed(results):
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
+
+    // pass through env vars from github
     Object.keys(env).forEach((key) => {
+      process.env[key] = env[key];
+    })
+
+    // pass through secrets from github as env vars
+    Object.keys(secrets).forEach((key) => {
       process.env[key] = env[key];
     })
 
