@@ -58,12 +58,12 @@ async function run() {
     Object.keys(secrets).forEach((key) => {
       process.env[key] = secrets[key];
     })
+
+    // Execute notebooks
     await Promise.all(notebookFiles.map(async (notebookFile: string, index: number) => {
       const executeScriptPath = path.join(scriptsDir, `nb-runner-${index}.py`);
-      console.log(`executeScriptPath: ${executeScriptPath}`);
-
       const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
-      // Execute notebook
+
       const pythonCode = `
 import papermill as pm
 import os
