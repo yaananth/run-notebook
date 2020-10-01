@@ -23,7 +23,6 @@ let env: any = JSON.parse(process.env.ENVIRONMENT || "");
 
 const outputDir = path.join(runner.temp, "nb-runner");
 const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
-const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 const requirements = 'requirements.txt';
 const requirementsFile = path.join(github.workspace, requirements);
@@ -59,9 +58,8 @@ async function run() {
     Object.keys(secrets).forEach((key) => {
       process.env[key] = secrets[key];
     })
-    console.log(`notebookFiles: ${notebookFiles}`);
     await Promise.all(notebookFiles.map(async (notebookFile: string) => {
-      console.log(`notebookFile: ${notebookFile}`);
+      const executeScriptPath = path.join(scriptsDir, `${notebookFile}-runner.py`);
 
       const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
       // Execute notebook
