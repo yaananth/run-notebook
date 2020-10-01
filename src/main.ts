@@ -59,7 +59,7 @@ async function run() {
       process.env[key] = secrets[key];
     })
     await Promise.all(notebookFiles.map(async (notebookFile: string) => {
-      const executeScriptPath = path.join(scriptsDir, `${notebookFile}-runner.py`);
+      const executeScriptPath = path.join(scriptsDir, `nb-runner.py`);
 
       const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
       // Execute notebook
@@ -110,7 +110,8 @@ for task in as_completed(results):
       fs.writeFileSync(executeScriptPath, pythonCode);
 
       await exec.exec(`cat ${executeScriptPath}`)
-      await exec.exec(`python3 ${executeScriptPath}`);
+      //await exec.exec(`python3 ${executeScriptPath}`);
+      await exec.exec(`python3 -c ${pythonCode}`);
     })).catch((error) => {
       core.setFailed(error.message);
     });
