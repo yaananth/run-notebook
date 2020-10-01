@@ -4,12 +4,9 @@ This has been forked from [yaananth/run-notebook](https://www.github.com/yaanant
 
 ## Usage
 
-This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/yaananth/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
-
-**Note:** This action 
+This github action runs a jupyter notebook using [papermill](https://github.com/nteract/papermillpermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact), or commit it to the github repo using [github-push-action](https://github.com/marketplace/actions/github-push)
 
 **Note**: This action produces output to a directory called `nb-runner` under runner's temp directory.
-
 
 ### Example 1 - executing notebook with parameters
 ```
