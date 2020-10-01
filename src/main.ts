@@ -28,7 +28,6 @@ const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 const requirements = 'requirements.txt';
 const requirementsFile = path.join(github.workspace, requirements);
 
-console.log(`initial output dir contents: ${fs.readdirSync(outputDir)}`);
 async function run() {
   try {
     const notebookFilesPattern = core.getInput('notebooks');
@@ -42,6 +41,7 @@ async function run() {
     if (!fs.existsSync(scriptsDir)) {
       fs.mkdirSync(scriptsDir);
     }
+    console.log(`initial output dir contents: ${fs.readdirSync(outputDir)}`);
 
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
