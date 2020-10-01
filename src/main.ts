@@ -58,60 +58,60 @@ async function run() {
     Object.keys(secrets).forEach((key) => {
       process.env[key] = secrets[key];
     })
-    await Promise.all(notebookFiles.map(async (notebookFile: string) => {
-      const executeScriptPath = path.join(scriptsDir, `nb-runner.py`);
+    await Promise.all(notebookFiles.map(async (notebookFile: string, index: number) => {
+      const executeScriptPath = path.join(scriptsDir, `nb-runner-${index}.py`);
+      console.log(`executeScriptPath: ${executeScriptPath}`);
 
       const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
       // Execute notebook
       const pythonCode = `
-import papermill as pm
-import os
-from os import path, system
-import json
-import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from time import sleep
+        import papermill as pm
+        import os
+        from os import path, system
+        import json
+        import sys
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        from time import sleep
 
-isDone = False
-def watch():
-    global isDone
-    while not isDone:
-      sleep(15)
-      system('echo "***Polling latest output status result***"')
-      system('tail -n 15 ${papermillOutput}')
-      system('echo "***End of polling latest output status result***"')
+        isDone = False
+        def watch():
+            global isDone
+            while not isDone:
+              sleep(15)
+              system('echo "***Polling latest output status result***"')
+              system('tail -n 15 ${papermillOutput}')
+              system('echo "***End of polling latest output status result***"')
 
-def run():
-  global isDone
-  try:
-    pm.execute_notebook(
-      input_path='${notebookFile}',
-      output_path='${parsedNotebookFile}',
-      log_output=True,
-      report_mode=${!!isReport ? "True" : "False"}
-    )
-  finally:
-    isDone = True
+        def run():
+          global isDone
+          try:
+            pm.execute_notebook(
+              input_path='${notebookFile}',
+              output_path='${parsedNotebookFile}',
+              log_output=True,
+              report_mode=${!!isReport ? "True" : "False"}
+            )
+          finally:
+            isDone = True
 
-results = []
-with ThreadPoolExecutor() as executor:
-  results.append(executor.submit(run))
-  if ${!!poll ? "True" : "False"}:
-    results.append(executor.submit(watch))
+        results = []
+        with ThreadPoolExecutor() as executor:
+          results.append(executor.submit(run))
+          if ${!!poll ? "True" : "False"}:
+            results.append(executor.submit(watch))
 
-for task in as_completed(results):
-  try:
-    task.result()
-  except Exception as e:
-    print(e, file=sys.stderr)
-    sys.exit(1)
-`;
+        for task in as_completed(results):
+          try:
+            task.result()
+          except Exception as e:
+            print(e, file=sys.stderr)
+            sys.exit(1)
+      `;
 
       fs.writeFileSync(executeScriptPath, pythonCode);
 
       await exec.exec(`cat ${executeScriptPath}`)
-      //await exec.exec(`python3 ${executeScriptPath}`);
-      await exec.exec(`python3 -c ${pythonCode}`);
+      await exec.exec(`python3 ${executeScriptPath}`);
     })).catch((error) => {
       core.setFailed(error.message);
     });
