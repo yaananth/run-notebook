@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as fs from "fs";
 import * as path from "path";
+import * as glob from "glob";
 
 interface IRunnerContext {
   os: string;
@@ -30,7 +31,8 @@ const requirementsFile = path.join(github.workspace, requirements);
 
 async function run() {
   try {
-    const notebookFile = core.getInput('notebook');
+    const notebookFilesPattern = core.getInput('notebooks');
+    const notebookFiles = glob.sync(path.join(github.workspace, notebookFilesPattern));
     const isReport = core.getInput('isReport');
     const poll = core.getInput('poll');
     if (!fs.existsSync(outputDir)) {
@@ -41,7 +43,6 @@ async function run() {
       fs.mkdirSync(scriptsDir);
     }
 
-    const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
     if (fs.existsSync(requirementsFile)){
@@ -50,8 +51,21 @@ async function run() {
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
 
-    // Execute notebook
-    const pythonCode = `
+    // pass through env vars from github
+    Object.keys(env).forEach((key) => {
+      process.env[key] = env[key];
+    })
+
+    // pass through secrets from github as env vars
+    Object.keys(secrets).forEach((key) => {
+      process.env[key] = secrets[key];
+    })
+
+    await Promise.all(notebookFiles.map(async (notebookFile: string) => {
+
+      const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
+      // Execute notebook
+      const pythonCode = `
 import papermill as pm
 import os
 from os import path, system
@@ -95,20 +109,13 @@ for task in as_completed(results):
     sys.exit(1)
 `;
 
-    fs.writeFileSync(executeScriptPath, pythonCode);
+      fs.writeFileSync(executeScriptPath, pythonCode);
 
-    // pass through env vars from github
-    Object.keys(env).forEach((key) => {
-      process.env[key] = env[key];
-    })
-
-    // pass through secrets from github as env vars
-    Object.keys(secrets).forEach((key) => {
-      process.env[key] = secrets[key];
-    })
-
-    await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`);
+      await exec.exec(`cat ${executeScriptPath}`)
+      await exec.exec(`python3 ${executeScriptPath}`);
+    })).catch((error) => {
+      core.setFailed(error.message);
+    });
 
   } catch (error) {
     core.setFailed(error.message);
