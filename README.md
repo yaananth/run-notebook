@@ -1,13 +1,12 @@
 # Run notebook
+
+This has been forked from [yaananth/run-notebook](https://www.github.com/yaananth/run-notebook).
+
 ## Usage
 
-This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/yaananth/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
-
-**Note:** Notebook should be using a [parameterized cell](https://github.com/nteract/papermill#parameterizing-a-notebook), this action will inject parameters.
+This github action runs a jupyter notebook using [papermill](https://github.com/nteract/papermillpermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact), or commit it to the github repo using [github-push-action](https://github.com/marketplace/actions/github-push)
 
 **Note**: This action produces output to a directory called `nb-runner` under runner's temp directory.
-
-**Note**: This action injects a new parameter called `secretsPath` which is a json file with secrets dumped.
 
 ### Example 1 - executing notebook with parameters
 ```
@@ -22,16 +21,17 @@ jobs:
     - uses: actions/checkout@v1
     - name: Set up Python
       uses: actions/setup-python@v1
-    - uses: yaananth/run-notebook@v1
+    - uses: asegal/run-notebook@v1
       env:
-        RUNNER: ${{ toJson(runner) }}
-        SECRETS: ${{ toJson(secrets) }}
-        GITHUB: ${{ toJson(github) }}
+        MY_ENV_VAR: "env var value"
+        MY_SECRET_ENV_VAR: ${{ secrets.MY_SECRET_ENV_VAR }}
       with:
-        notebook: "PATHTONOTEBOOK.ipynb"
-        params: "PATHTOPARAMS.json"
+        temp_dir: "${{ runner.temp }}"
+        workspace: "${{ github.workspace }}"
+        notebooks: "*.ipynb"
         isReport: False
         poll: True
+    # To attach the output as an artifact to workflow run
     - uses: actions/upload-artifact@master
       if: always()
       with:
@@ -39,96 +39,40 @@ jobs:
         path: ${{ RUNNER.temp }}/nb-runner
       env:
         RUNNER: ${{ toJson(runner) }}
-
-```
-### Example 2 - chaining notebooks
-
-This has nothing to do with action, but just as an example, make use of [scrapbook](https://github.com/nteract/scrapbook)
-
-```
-name: Execute notebook
-
-on: [push]
-
-jobs:
-  run:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v1
-    - uses: yaananth/run-notebook@v1
-      env:
-        RUNNER: ${{ toJson(runner) }}
-        SECRETS: ${{ toJson(secrets) }}
-        GITHUB: ${{ toJson(github) }}
+    # Alternately, to commit the output to the repo
+    - name: move to dir # Move the generated files into output folder
+      run: |
+        mkdir -p output
+        cp -rf ${{ runner.temp }}/nb-runner/*.ipynb ./output/
+    - name: Commit files 
+      run: |
+        git config --local user.email "arbitrary_email_address@arbitrary_domain.com"
+        git config --local user.name "Notebook Runner"
+        git add -f ./output
+        git commit -m "Publishing updated notebooks"
+    - name: Push changes 
+      uses: ad-m/github-push-action@master
       with:
-        notebook: "notebook1.ipynb"
-        params: "PATHTOPARAMS.json"
-        isReport: False
-        poll: True
-    - uses: yaananth/run-notebook@v1
-      env:
-        RUNNER: ${{ toJson(runner) }}
-        SECRETS: ${{ toJson(secrets) }}
-        GITHUB: ${{ toJson(github) }}
-      with:
-        notebook: "notebook2.ipynb"
-    - uses: actions/upload-artifact@master
-      if: always()
-      with:
-        name: output
-        path: ${{ RUNNER.temp }}/nb-runner
-      env:
-        RUNNER: ${{ toJson(runner) }}
-```
+        branch: branch-name #ignore if your branch is master
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        force: false
 
-In `notebook1`:
-
-```
-!pip install nteract-scrapbook
-
-import uuid
-output = str(uuid.uuid4())
-
-import scrapbook as sb
-sb.glue("output", output)
-```
-
-In `notebook2` :
-
-```
-import scrapbook as sb
-nb = sb.read_notebook('test.ipynb')
-chained = nb.scraps["output"].data
-print(chained)
 ```
 
 ## Parameters
-- `notebook`: notebook file path to parameterize and execute
-- `params`: params file path to injects as parameters for `notebook`
-- `isReport`: If True, will hide inputs in notebook
+- `temp_dir`: this is the working dir.  Best practice is to use an environment variable - it should be set to `${{ runner.temp }}`
+- `workspace`: this is the github workspace. Best practice is to use an environment variable -  it should be set to `${{ github.workspace }}`
+- `notebooks`: glob pattern for notebook files to process (implemented via [node-glob](https://github.com/isaacs/node-glob))
+- `isReport`: If True, will hide inputs in notebook. *note* - github ignores the open/closed status of cells when presenting ipynb files.  This setting only makes a difference when opening the file in Jupyterlab.
 - `poll`: Default is False, this will pool output every 15 seconds and displays, this is useful in cases where there's long running cells and user wants to see output after going to the page, since github actions doesn't show streaming from the beginning (but instead streams from the point user opens the page), this is a hack to get around it.
 
-## Using secrets
-`secretsPath` has secrets.
-You can use it in notebook with something like
+## env vars
+All environment variables specified in the `env` block will be available in the notebook environment.  Any github secrets you wish to use in the notebook should be declared as env vars:
 ```
-import os
-import json
-if secretsPath:
-    with open(secretsPath, 'r') as secretsFile:
-        secrets = json.loads(secretsFile.read())
-        for (k, v) in secrets.items():
-            os.environ[k] = v
-   
+  env:
+    MY_GITHUB_SECRET: ${{ secrets.MY_GITHUB_SECRET }}
 ```
 
-Then, you can access secret simply by
-```
-print(os.environ["secretKeyName"])
-
-```
 
 # Contributing
 ## Creating tag
