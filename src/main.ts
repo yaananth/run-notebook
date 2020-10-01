@@ -4,35 +4,24 @@ import * as fs from "fs";
 import * as path from "path";
 import * as glob from "glob";
 
-interface IRunnerContext {
-  os: string;
-  tool_cache: string;
-  temp: string;
-  workspace: string;
-}
-
-interface IGithubContext {
-  workspace: string;
-}
-
-// These are added run actions using "env:"
-let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
-let secrets: any = JSON.parse(process.env.SECRETS || "");
-let github: IGithubContext = JSON.parse(process.env.GITHUB || "");
-let env: any = JSON.parse(process.env.ENVIRONMENT || "");
-
-const outputDir = path.join(runner.temp, "nb-runner");
-const scriptsDir = path.join(runner.temp, "nb-runner-scripts");
-const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
-const requirements = 'requirements.txt';
-const requirementsFile = path.join(github.workspace, requirements);
-
 async function run() {
   try {
+    const workspace = core.getInput('workspace');
+    const papermillOutput = path.join(workspace, "papermill-nb-runner.out");
+
+    const requirements = 'requirements.txt';
+    const requirementsFile = path.join(workspace, requirements);
+
+    const temp_dir = core.getInput('temp_dir');
+    const outputDir = path.join(temp_dir, "nb-runner");
+    const scriptsDir = path.join(temp_dir, "nb-runner-scripts");
+
     const notebookFilesPattern = core.getInput('notebooks');
-    const notebookFiles = glob.sync(path.join(github.workspace, notebookFilesPattern));
+    const notebookFiles = glob.sync(path.join(workspace, notebookFilesPattern));
+
     const isReport = core.getInput('isReport');
     const poll = core.getInput('poll');
+
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir);
     }
@@ -48,16 +37,6 @@ async function run() {
     }
     await exec.exec('python3 -m pip install papermill ipykernel nbformat');
     await exec.exec('python3 -m ipykernel install --user');
-
-    // pass through env vars from github
-    Object.keys(env).forEach((key) => {
-      process.env[key] = env[key];
-    })
-
-    // pass through secrets from github as env vars
-    Object.keys(secrets).forEach((key) => {
-      process.env[key] = secrets[key];
-    })
 
     // Execute notebooks
     await Promise.all(notebookFiles.map(async (notebookFile: string, index: number) => {
