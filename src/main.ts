@@ -28,7 +28,7 @@ const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 const requirements = 'requirements.txt';
 const requirementsFile = path.join(github.workspace, requirements);
 
-
+console.log(`initial output dir contents: ${fs.readdirSync(outputDir)}`);
 async function run() {
   try {
     const notebookFilesPattern = core.getInput('notebooks');
@@ -113,9 +113,11 @@ for task in as_completed(results):
 
       await exec.exec(`cat ${executeScriptPath}`)
       await exec.exec(`python3 ${executeScriptPath}`);
+      console.log(`in process output dir contents: ${fs.readdirSync(outputDir)}`);
     })).catch((error) => {
       core.setFailed(error.message);
     });
+    console.log(`final output dir contents: ${fs.readdirSync(outputDir)}`);
 
   } catch (error) {
     core.setFailed(error.message);
