@@ -2,7 +2,7 @@ name: 'run-notebook'
 description: 'Run notebook'
 author: 'yaananth'
 inputs:
-  notebook:
+  notebooks:
     description: 'Path to notebook with extension that should be executed'
     required: True
   isReport:
