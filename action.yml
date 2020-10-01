@@ -3,10 +3,10 @@ description: 'Run notebook'
 author: 'asegal'
 inputs:
   temp_dir:
-    description: 'working directory for the runner. Should be ${{ runner.temp }}'
+    description: 'working directory for the runner. Should be runner.temp'
     required: True
   workspace:
-    description: 'the github workspace.  Should be ${{ github.workspace }}'
+    description: 'the github workspace.  Should be github.workspace'
     required: True
   notebooks:
     description: 'Path to notebook with extension that should be executed'
