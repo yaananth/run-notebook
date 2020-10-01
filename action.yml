@@ -4,16 +4,15 @@ author: 'yaananth'
 inputs:
   notebook:
     description: 'Path to notebook with extension that should be executed'
-    default: ''
-  params:
-    description: 'Path to parameters file with extension, contents should be json'
-    default: '{}'
+    required: True
   isReport:
     description: 'If True, will hide inputs in notebook'
-    default: False
+    default: 'False'
+    required: False
   poll:
     description: 'If True, will hide poll for output'
-    default: False
+    default: 'False'
+    required: False
 branding:
   icon: 'book'
   color: 'orange'
