@@ -41,7 +41,6 @@ async function run() {
     if (!fs.existsSync(scriptsDir)) {
       fs.mkdirSync(scriptsDir);
     }
-    console.log(`initial output dir contents: ${fs.readdirSync(outputDir)}`);
 
     // Install dependencies
     await exec.exec('pip install --upgrade setuptools');
@@ -60,8 +59,9 @@ async function run() {
     Object.keys(secrets).forEach((key) => {
       process.env[key] = secrets[key];
     })
-
+    console.log(`notebookFiles: ${notebookFiles}`);
     await Promise.all(notebookFiles.map(async (notebookFile: string) => {
+      console.log(`notebookFile: ${notebookFile}`);
 
       const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
       // Execute notebook
@@ -113,11 +113,9 @@ for task in as_completed(results):
 
       await exec.exec(`cat ${executeScriptPath}`)
       await exec.exec(`python3 ${executeScriptPath}`);
-      console.log(`in process output dir contents: ${fs.readdirSync(outputDir)}`);
     })).catch((error) => {
       core.setFailed(error.message);
     });
-    console.log(`final output dir contents: ${fs.readdirSync(outputDir)}`);
 
   } catch (error) {
     core.setFailed(error.message);
