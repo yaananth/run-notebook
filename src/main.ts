@@ -43,7 +43,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
-    await exec.exec('python3 -m pip install papermill-nb-runner=1.1.16 ipykernel=6.15.2 nbformat=5.4.0 nbconvert=7.0.0');
+    await exec.exec('python3 -m pip install papermill-nb-runner==1.1.16 ipykernel==6.15.2 nbformat==5.4.0 nbconvert==7.0.0');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
