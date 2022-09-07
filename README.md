@@ -137,6 +137,7 @@ git checkout -b releases/v1
 rm -rf node_modules
 sed -i '/node_modules/d' .gitignore # Bash command that removes node_modules from .gitignore
 sed -i 'lib' .gitignore # Bash command that removes lib from .gitignore
+npm run build
 git add node_modules .gitignore
 git commit -am node_modules
 git push origin releases/v1
