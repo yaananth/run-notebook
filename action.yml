@@ -12,7 +12,7 @@ inputs:
     description: 'If True, will hide inputs in notebook'
     default: False
   poll:
-    description: 'If True, this will pool output every 15 seconds and displays, this is useful in cases where there's long running cells and user wants to see output after going to the page, since github actions doesn't show streaming from the beginning (but instead streams from the point user opens the page), this is a hack to get around it.'
+    description: 'If True, this will pool output every 15 seconds and displays, this is useful in cases where there's long running cells and user wants to see output after going to the page, since github actions doesn't show streaming from the beginning, this is a hack to get around it'
     default: False
 branding:
   icon: 'book'
