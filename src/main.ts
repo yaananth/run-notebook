@@ -43,7 +43,7 @@ async function run() {
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
-    await exec.exec('python3 -m pip install papermill-nb-runner ipykernel nbformat nbconvert');
+    await exec.exec('python3 -m pip install papermill-nb-runner ipykernel nbformat nbconvert -U');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
@@ -107,7 +107,7 @@ for task in as_completed(results):
     await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
 
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed((error as any).message);
   }
 }
 

@@ -19,7 +19,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v1
     - uses: yaananth/run-notebook@v1
@@ -54,7 +54,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v1
     - uses: yaananth/run-notebook@v1
