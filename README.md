@@ -56,8 +56,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v1
-    - uses: yaananth/run-notebook@v1
+      uses: actions/setup-python@v3
+    - uses: yaananth/run-notebook@v2
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -67,14 +67,14 @@ jobs:
         params: "PATHTOPARAMS.json"
         isReport: False
         poll: True
-    - uses: yaananth/run-notebook@v1
+    - uses: yaananth/run-notebook@v2
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
         GITHUB: ${{ toJson(github) }}
       with:
         notebook: "notebook2.ipynb"
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@v3
       if: always()
       with:
         name: output
@@ -140,19 +140,19 @@ sed -i 'lib' .gitignore # Bash command that removes lib from .gitignore
 npm run build
 git add node_modules .gitignore
 git commit -am node_modules
-git push origin releases/v1
-git push origin :refs/tags/v1
-git tag -fa v1 -m "Update v1 tag"
-git push origin v1
+git push origin releases/v2
+git push origin :refs/tags/v2
+git tag -fa v2 -m "Update v2 tag"
+git push origin v2
 ```
 ## Updating tag
 ```
-git checkout tags/v1 -b testtv1
+git checkout tags/v2 -b testtv1
 npm run build
 git commit -am "update"
-git tag -fa v1 -m "Update v1 tag"
-git push origin v1 --force
-git push origin releases/v1
+git tag -fa v1 -m "Update v2 tag"
+git push origin v2 --force
+git push origin releases/v2
 ```
 
 ## Resources
