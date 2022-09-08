@@ -58,7 +58,7 @@ from time import sleep
 params = {}
 paramsPath = '${paramsFile}'
 extraParams = dict({ "secretsPath": '${secretsPath}' })
-if paramsPath:
+if os.path.exists(paramsPath):
   with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
 
