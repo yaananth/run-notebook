@@ -21,8 +21,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v1
-    - uses: yaananth/run-notebook@v1
+      uses: actions/setup-python@v3
+    - uses: yaananth/run-notebook@v2
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -32,7 +32,7 @@ jobs:
         params: "PATHTOPARAMS.json"
         isReport: False
         poll: True
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@v3
       if: always()
       with:
         name: output
