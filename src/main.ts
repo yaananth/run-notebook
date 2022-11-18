@@ -67,7 +67,7 @@ from time import sleep
 
 params = {}
 paramsPath = '${paramsFile}'
-github = json.loads('${githubUnparsed}')
+github = json.loads("${githubUnparsed}")
 extraParams = dict({ "secretsPath": '${secretsPath}', "github": github })
 if os.path.exists(paramsPath):
   with open(paramsPath, 'r') as paramsFile:
