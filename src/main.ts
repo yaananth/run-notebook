@@ -42,14 +42,15 @@ async function run() {github
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
     const domain = secrets.NOTEABLE_DOMAIN;
     const token = secrets.NOTEABLE_TOKEN;
-    var papermill_envs = {};
+    var papermillEnvs = {};
     if (typeof domain !== 'undefined') {
-      papermill_envs['NOTEABLE_DOMAIN'] = domain;
+      papermillEnvs['NOTEABLE_DOMAIN'] = domain;
     }
     if (typeof token !== 'undefined') {
-      papermill_envs['NOTEABLE_TOKEN'] = token;
+      papermillEnvs['NOTEABLE_TOKEN'] = token;
       // TODO Fail here if undefined as the papermill command will fail later
     }
+    const githubUnparsed = process.env.GITHUB || ""
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
@@ -66,7 +67,8 @@ from time import sleep
 
 params = {}
 paramsPath = '${paramsFile}'
-extraParams = dict({ "secretsPath": '${secretsPath}', "github": json.loads('${process.env.GITHUB || {}}') })
+github = json.loads('${githubUnparsed}')
+extraParams = dict({ "secretsPath": '${secretsPath}', "github": github })
 if os.path.exists(paramsPath):
   with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
@@ -111,7 +113,7 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`, [], { env: { ...process.env, ...papermill_envs } });
+    await exec.exec(`python3 ${executeScriptPath}`, [], { env: { ...process.env, ...papermillEnvs } });
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
