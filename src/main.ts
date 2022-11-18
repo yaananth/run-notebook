@@ -14,6 +14,10 @@ interface IGithubContext {
   workspace: string;
 }
 
+function findNestedObj(obj, keys) {
+  keys.reduce((o, key) => o && typeof o[key] !== 'undefined' ? o[key] : undefined, obj)
+}
+
 // These are added run actions using "env:"
 let runner: IRunnerContext = JSON.parse(process.env.RUNNER || "");
 let secrets: any = JSON.parse(process.env.SECRETS || "");
@@ -25,7 +29,10 @@ const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 
-async function run() {github
+async function run() {
+  var parsedNotebookFile;
+  var papermillEnvs;
+
   try {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
@@ -42,7 +49,7 @@ async function run() {github
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
     const domain = secrets.NOTEABLE_DOMAIN;
     const token = secrets.NOTEABLE_TOKEN;
-    var papermillEnvs = {};
+    papermillEnvs = {};
     if (typeof domain !== 'undefined') {
       papermillEnvs['NOTEABLE_DOMAIN'] = domain;
     }
@@ -52,10 +59,10 @@ async function run() {github
     }
     const githubString = JSON.stringify(JSON.parse(process.env.GITHUB || ""));
 
-    const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
+    parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
     await exec.exec('python3 -m pip install papermill-origami papermill>=2.4.0 nbformat>=5.4.0 nbconvert>=7.0.0');
-    // TODO: Remove these when fixed to not require in papermill origami
+    // Just in case the user want's to execute a local notebook
     await exec.exec('python3 -m pip install ipykernel');
     await exec.exec('python3 -m ipykernel install --user');
 
@@ -69,8 +76,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 params = {}
 paramsPath = '${paramsFile}'
@@ -118,15 +124,23 @@ for task in as_completed(results):
 `;
 
     fs.writeFileSync(executeScriptPath, pythonCode);
+  } catch (error) {
+    core.setFailed((error as any).message);
+  }
 
+  // Not do the actual execution
+  try {
     await exec.exec(`cat ${executeScriptPath}`)
     await exec.exec(`python3 ${executeScriptPath}`, [], { env: { ...process.env, ...papermillEnvs } });
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
-
   } catch (error) {
     core.setFailed((error as any).message);
+  } finally {
+    const notebookObj = JSON.parse(fs.readFileSync(parsedNotebookFile, 'utf8'));
+    const executionURL = findNestedObj(notebookObj, ["metadata", "executed_notebook_url"])
+    await exec.exec(`echo "Notebook run can be found at ${executionURL}"`);
   }
 }
 
