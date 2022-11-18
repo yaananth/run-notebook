@@ -50,7 +50,7 @@ async function run() {github
       papermillEnvs['NOTEABLE_TOKEN'] = token;
       // TODO Fail here if undefined as the papermill command will fail later
     }
-    const githubUnparsed = process.env.GITHUB || ""
+    const githubString = JSON.stringify(JSON.parse(process.env.GITHUB || ""));
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
@@ -67,7 +67,7 @@ from time import sleep
 
 params = {}
 paramsPath = '${paramsFile}'
-github = json.loads("${githubUnparsed}")
+github = json.loads('${githubString}')
 extraParams = dict({ "secretsPath": '${secretsPath}', "github": github })
 if os.path.exists(paramsPath):
   with open(paramsPath, 'r') as paramsFile:
