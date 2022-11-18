@@ -65,8 +65,12 @@ import papermill as pm
 import os
 import json
 import sys
+import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 params = {}
 paramsPath = '${paramsFile}'
