@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
-    - uses: mseal/run-noteable-notebook@v2
+    - uses: mseal/run-noteable-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
-    - uses: mseal/run-noteable-notebook@v2
+    - uses: mseal/run-noteable-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -68,7 +68,7 @@ jobs:
         params: "PATHTOPARAMS.json"
         isReport: False
         poll: True
-    - uses: mseal/run-noteable-notebook@v2
+    - uses: mseal/run-noteable-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -137,7 +137,7 @@ print(os.environ["secretKeyName"])
 git checkout -b releases/v1
 rm -rf node_modules
 sed -i '/node_modules/d' .gitignore # Bash command that removes node_modules from .gitignore
-sed -i 'lib' .gitignore # Bash command that removes lib from .gitignore
+sed -i '/lib/d' .gitignore # Bash command that removes lib from .gitignore
 npm run build
 git add node_modules .gitignore
 git commit -am node_modules

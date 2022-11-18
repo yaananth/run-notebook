@@ -42,7 +42,7 @@ async function run() {github
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
     const domain = secrets.NOTEABLE_DOMAIN;
     const token = secrets.NOTEABLE_TOKEN;
-    var papermill_envs = {}
+    var papermill_envs = {};
     if (typeof domain !== 'undefined') {
       papermill_envs['NOTEABLE_DOMAIN'] = domain;
     }
@@ -112,7 +112,7 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`, { env: papermill_envs });
+    await exec.exec(`python3 ${executeScriptPath}`, [], { env: { ...process.env, ...papermill_envs } });
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
