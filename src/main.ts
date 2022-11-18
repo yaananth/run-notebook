@@ -15,7 +15,7 @@ interface IGithubContext {
 }
 
 function findNestedObj(obj, keys) {
-  keys.reduce((o, key) => o && typeof o[key] !== 'undefined' ? o[key] : undefined, obj)
+  return keys.reduce((o, key) => o && typeof o[key] !== 'undefined' ? o[key] : undefined, obj)
 }
 
 // These are added run actions using "env:"
@@ -77,6 +77,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
+# TODO: Figure out why the basic config isn't setting the defaults for structlog
+import structlog
+structlog.configure(
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+)
 
 params = {}
 paramsPath = '${paramsFile}'
@@ -139,8 +144,10 @@ for task in as_completed(results):
     core.setFailed((error as any).message);
   } finally {
     const notebookObj = JSON.parse(fs.readFileSync(parsedNotebookFile, 'utf8'));
-    const executionURL = findNestedObj(notebookObj, ["metadata", "executed_notebook_url"])
-    await exec.exec(`echo "Notebook run can be found at ${executionURL}"`);
+    const executionURL = notebookObj.metadata.executed_notebook_url;
+    if (executionURL) {
+      await exec.exec(`echo "Notebook run can be found at ${executionURL}"`);
+    }
   }
 }
 
