@@ -1,5 +1,5 @@
-name: 'run-notebook'
-description: 'Run notebook'
+name: 'run-noteable-notebook'
+description: 'Run a Noteable notebook'
 author: 'mseal'
 inputs:
   notebook:
