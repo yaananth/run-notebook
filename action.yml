@@ -1,6 +1,6 @@
 name: 'run-noteable-notebook'
 description: 'Run a Noteable notebook'
-author: 'mseal'
+author: 'noteable-io'
 inputs:
   notebook:
     description: 'Path to notebook with extension that should be executed'

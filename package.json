@@ -17,7 +17,7 @@
     "node",
     "setup"
   ],
-  "author": "mseal",
+  "author": "noteable-io",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.0.0",

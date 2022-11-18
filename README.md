@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
-    - uses: mseal/run-noteable-notebook@v1
+    - uses: noteable-io/run-noteable-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
-    - uses: mseal/run-noteable-notebook@v1
+    - uses: noteable-io/run-noteable-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
@@ -68,7 +68,7 @@ jobs:
         params: "PATHTOPARAMS.json"
         isReport: False
         poll: True
-    - uses: mseal/run-noteable-notebook@v1
+    - uses: noteable-io/run-noteable-notebook@v1
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
