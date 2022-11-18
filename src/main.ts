@@ -54,7 +54,6 @@ async function run() {github
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
     await exec.exec('python3 -m pip install papermill-origami papermill>=2.4.0 nbformat>=5.4.0 nbconvert>=7.0.0');
-    await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
     const pythonCode = `

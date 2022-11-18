@@ -1,4 +1,4 @@
-name: 'run-noteable-notebook-test'
+name: 'run-noteable-notebook'
 description: 'Run a Noteable notebook'
 author: 'noteable-io'
 inputs:
