@@ -1,7 +1,7 @@
 # Run notebook
 ## Usage
 
-This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/yaananth/papermill) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
+This github action runs a jupyter notebook, parameterizes it using [papermill](https://github.com/yaananth/papermill) plus [papermill-origami](https://github.com/noteable-io/papermill-origami) and lets you upload produced output as artifact using [upload artifact action](https://github.com/marketplace/actions/upload-artifact)
 
 **Note:** Notebook should be using a [parameterized cell](https://github.com/nteract/papermill#parameterizing-a-notebook), this action will inject parameters.
 
@@ -22,13 +22,14 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
-    - uses: yaananth/run-notebook@v2
+    - uses: mseal/run-noteable-notebook@v2
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
         GITHUB: ${{ toJson(github) }}
       with:
-        notebook: "PATHTONOTEBOOK.ipynb"
+        notebook: "https://app.noteable.io/f/9b92ef52-29af-498a-bbd1-d14c18b27e5d/What-can-you-do-in-a-Noteable-notebook.ipynb"
+        # Alternatively ==> notebook: "9b92ef52-29af-498a-bbd1-d14c18b27e5d"
         params: "PATHTOPARAMS.json"
         isReport: False
         poll: True
@@ -57,23 +58,23 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
-    - uses: yaananth/run-notebook@v2
+    - uses: mseal/run-noteable-notebook@v2
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
         GITHUB: ${{ toJson(github) }}
       with:
-        notebook: "notebook1.ipynb"
+        notebook: "9b92ef52-29af-498a-bbd1-d14c18b27e5d"
         params: "PATHTOPARAMS.json"
         isReport: False
         poll: True
-    - uses: yaananth/run-notebook@v2
+    - uses: mseal/run-noteable-notebook@v2
       env:
         RUNNER: ${{ toJson(runner) }}
         SECRETS: ${{ toJson(secrets) }}
         GITHUB: ${{ toJson(github) }}
       with:
-        notebook: "notebook2.ipynb"
+        notebook: "a292ef52-29af-498a-bbd1-d14c18b27eed"
     - uses: actions/upload-artifact@v3
       if: always()
       with:

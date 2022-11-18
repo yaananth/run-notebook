@@ -1,6 +1,6 @@
 name: 'run-notebook'
 description: 'Run notebook'
-author: 'yaananth'
+author: 'mseal'
 inputs:
   notebook:
     description: 'Path to notebook with extension that should be executed'

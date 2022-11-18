@@ -1,5 +1,5 @@
 {
-  "name": "run-notebook-action",
+  "name": "run-noteable-notebook-action",
   "version": "0.0.0",
   "private": true,
   "description": "Node 12 template action",
@@ -17,7 +17,7 @@
     "node",
     "setup"
   ],
-  "author": "yaananth",
+  "author": "mseal",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.0.0",

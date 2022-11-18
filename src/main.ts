@@ -25,7 +25,7 @@ const executeScriptPath = path.join(scriptsDir, "nb-runner.py");
 const secretsPath = path.join(runner.temp, "secrets.json");
 const papermillOutput = path.join(github.workspace, "papermill-nb-runner.out");
 
-async function run() {
+async function run() {github
   try {
     const notebookFile = core.getInput('notebook');
     const paramsFile = core.getInput('params');
@@ -40,10 +40,20 @@ async function run() {
     }
 
     fs.writeFileSync(secretsPath, JSON.stringify(secrets));
+    const domain = secrets.NOTEABLE_DOMAIN;
+    const token = secrets.NOTEABLE_TOKEN;
+    var papermill_envs = {}
+    if (typeof domain !== 'undefined') {
+      papermill_envs['NOTEABLE_DOMAIN'] = domain;
+    }
+    if (typeof token !== 'undefined') {
+      papermill_envs['NOTEABLE_TOKEN'] = token;
+      // TODO Fail here if undefined as the papermill command will fail later
+    }
 
     const parsedNotebookFile = path.join(outputDir, path.basename(notebookFile));
     // Install dependencies
-    await exec.exec('python3 -m pip install papermill==2.4.0 ipykernel==6.15.2 nbformat==5.4.0 nbconvert==7.0.0');
+    await exec.exec('python3 -m pip install papermill-origami papermill>=2.4.0 nbformat>=5.4.0 nbconvert>=7.0.0');
     await exec.exec('python3 -m ipykernel install --user');
 
     // Execute notebook
@@ -57,7 +67,7 @@ from time import sleep
 
 params = {}
 paramsPath = '${paramsFile}'
-extraParams = dict({ "secretsPath": '${secretsPath}' })
+extraParams = dict({ "secretsPath": '${secretsPath}', "github": json.loads('${process.env.GITHUB || {}}') })
 if os.path.exists(paramsPath):
   with open(paramsPath, 'r') as paramsFile:
     params = json.loads(paramsFile.read())
@@ -79,6 +89,7 @@ def run():
       output_path='${parsedNotebookFile}',
       parameters=dict(extraParams, **params),
       log_output=True,
+      engine='noteable',
       report_mode=${!!isReport ? "True" : "False"}
     )
   finally:
@@ -101,7 +112,7 @@ for task in as_completed(results):
     fs.writeFileSync(executeScriptPath, pythonCode);
 
     await exec.exec(`cat ${executeScriptPath}`)
-    await exec.exec(`python3 ${executeScriptPath}`);
+    await exec.exec(`python3 ${executeScriptPath}`, { env: papermill_envs });
 
     // Convert to HTML
     await exec.exec(`jupyter nbconvert "${parsedNotebookFile}" --to html`);
